@@ -1,0 +1,217 @@
+---
+layout: page
+title: Thư viện Epub
+permalink: /epubs/
+---
+
+<div class="epub-library">
+  <!-- Search and Filter Section -->
+  <div class="library-controls">
+    <div class="search-section">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Tìm kiếm sách, tác giả..." class="search-input">
+        <i class="fas fa-search search-icon"></i>
+      </div>
+    </div>
+    
+    <div class="filter-section">
+      <div class="filter-group">
+        <label for="genreFilter">Thể loại:</label>
+        <select id="genreFilter" class="filter-select">
+          <option value="">Tất cả thể loại</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="sortBy">Sắp xếp:</label>
+        <select id="sortBy" class="filter-select">
+          <option value="title">Tên sách (A-Z)</option>
+          <option value="author">Tác giả (A-Z)</option>
+          <option value="date">Năm xuất bản</option>
+          <option value="rating">Đánh giá</option>
+        </select>
+      </div>
+      
+      <div class="view-toggle">
+        <button id="gridView" class="view-btn active" title="Xem dạng lưới">
+          <i class="fas fa-th"></i>
+        </button>
+        <button id="listView" class="view-btn" title="Xem dạng danh sách">
+          <i class="fas fa-list"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Stats Section -->
+  <div class="library-stats">
+    <div class="stat-item">
+      <span class="stat-number" id="totalBooks">{{ site.epubs.size }}</span>
+      <span class="stat-label">Tổng số sách</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number" id="filteredBooks">{{ site.epubs.size }}</span>
+      <span class="stat-label">Kết quả hiển thị</span>
+    </div>
+  </div>
+  
+  <!-- Books Grid -->
+  <div class="epub-grid" id="epubGrid">
+    {% for epub in site.epubs %}
+      {% include epub-card.html epub=epub %}
+    {% endfor %}
+  </div>
+  
+  <!-- No Results Message -->
+  <div class="no-results" id="noResults" style="display: none;">
+    <i class="fas fa-search"></i>
+    <h3>Không tìm thấy kết quả</h3>
+    <p>Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</p>
+  </div>
+  
+  <!-- Loading Indicator -->
+  <div class="loading" id="loading" style="display: none;">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Đang tải...</p>
+  </div>
+</div>
+
+<!-- JavaScript for search, filter, and sort functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Get all epub data
+  const epubs = [
+    {% for epub in site.epubs %}
+    {
+      title: {{ epub.title | jsonify }},
+      author: {{ epub.author | jsonify }},
+      genre: {{ epub.genre | jsonify }},
+      description: {{ epub.description | jsonify }},
+      rating: {{ epub.rating | jsonify }},
+      published_date: {{ epub.published_date | jsonify }},
+      url: {{ epub.url | jsonify }},
+      element: null // Will be set later
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ];
+  
+  // Get DOM elements
+  const searchInput = document.getElementById('searchInput');
+  const genreFilter = document.getElementById('genreFilter');
+  const sortBy = document.getElementById('sortBy');
+  const gridView = document.getElementById('gridView');
+  const listView = document.getElementById('listView');
+  const epubGrid = document.getElementById('epubGrid');
+  const noResults = document.getElementById('noResults');
+  const filteredBooksCount = document.getElementById('filteredBooks');
+  
+  // Get all epub card elements
+  const epubCards = Array.from(epubGrid.querySelectorAll('.epub-card'));
+  
+  // Map elements to epub data
+  epubs.forEach((epub, index) => {
+    if (epubCards[index]) {
+      epub.element = epubCards[index];
+    }
+  });
+  
+  // Populate genre filter
+  const allGenres = new Set();
+  epubs.forEach(epub => {
+    if (epub.genre) {
+      epub.genre.forEach(genre => allGenres.add(genre));
+    }
+  });
+  
+  Array.from(allGenres).sort().forEach(genre => {
+    const option = document.createElement('option');
+    option.value = genre;
+    option.textContent = genre;
+    genreFilter.appendChild(option);
+  });
+  
+  // Filter and search function
+  function filterAndSearch() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const selectedGenre = genreFilter.value;
+    const sortOption = sortBy.value;
+    
+    let filteredEpubs = epubs.filter(epub => {
+      // Search filter
+      const matchesSearch = !searchTerm || 
+        epub.title.toLowerCase().includes(searchTerm) ||
+        epub.author.toLowerCase().includes(searchTerm) ||
+        (epub.description && epub.description.toLowerCase().includes(searchTerm));
+      
+      // Genre filter
+      const matchesGenre = !selectedGenre || 
+        (epub.genre && epub.genre.includes(selectedGenre));
+      
+      return matchesSearch && matchesGenre;
+    });
+    
+    // Sort
+    filteredEpubs.sort((a, b) => {
+      switch (sortOption) {
+        case 'author':
+          return a.author.localeCompare(b.author);
+        case 'date':
+          return new Date(b.published_date) - new Date(a.published_date);
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+        default: // title
+          return a.title.localeCompare(b.title);
+      }
+    });
+    
+    // Hide all cards first
+    epubCards.forEach(card => card.style.display = 'none');
+    
+    // Show filtered cards
+    filteredEpubs.forEach(epub => {
+      if (epub.element) {
+        epub.element.style.display = 'block';
+      }
+    });
+    
+    // Update count
+    filteredBooksCount.textContent = filteredEpubs.length;
+    
+    // Show/hide no results message
+    if (filteredEpubs.length === 0) {
+      noResults.style.display = 'block';
+      epubGrid.style.display = 'none';
+    } else {
+      noResults.style.display = 'none';
+      epubGrid.style.display = 'grid';
+    }
+  }
+  
+  // View toggle function
+  function toggleView(viewType) {
+    if (viewType === 'list') {
+      epubGrid.classList.add('list-view');
+      listView.classList.add('active');
+      gridView.classList.remove('active');
+    } else {
+      epubGrid.classList.remove('list-view');
+      gridView.classList.add('active');
+      listView.classList.remove('active');
+    }
+  }
+  
+  // Event listeners
+  searchInput.addEventListener('input', filterAndSearch);
+  genreFilter.addEventListener('change', filterAndSearch);
+  sortBy.addEventListener('change', filterAndSearch);
+  gridView.addEventListener('click', () => toggleView('grid'));
+  listView.addEventListener('click', () => toggleView('list'));
+  
+  // Debounce search input
+  let searchTimeout;
+  searchInput.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(filterAndSearch, 300);
+  });
+});
+</script>

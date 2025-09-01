@@ -1,0 +1,74 @@
+{% assign epub = include.epub %}
+
+<div class="epub-card">
+  <a href="{{ epub.url }}" class="epub-card-link">
+    <div class="epub-card-cover">
+      <img src="{{ epub.cover_image }}" alt="{{ epub.title }} cover" class="cover-image" loading="lazy">
+      {% if epub.rating %}
+      <div class="rating-badge">
+        <i class="fas fa-star"></i>
+        <span>{{ epub.rating }}</span>
+      </div>
+      {% endif %}
+    </div>
+    
+    <div class="epub-card-content">
+      <h3 class="epub-card-title">{{ epub.title }}</h3>
+      <p class="epub-card-author">{{ epub.author }}</p>
+      
+      {% if epub.genre %}
+      <div class="epub-card-genres">
+        {% for genre in epub.genre limit:2 %}
+          <span class="genre-tag">{{ genre }}</span>
+        {% endfor %}
+        {% if epub.genre.size > 2 %}
+          <span class="genre-more">+{{ epub.genre.size | minus: 2 }}</span>
+        {% endif %}
+      </div>
+      {% endif %}
+      
+      {% if epub.description %}
+      <p class="epub-card-description">
+        {{ epub.description | truncate: 100 }}
+      </p>
+      {% endif %}
+      
+      <div class="epub-card-meta">
+        {% if epub.pages %}
+        <span class="meta-item">
+          <i class="fas fa-file-alt"></i>
+          {{ epub.pages }} trang
+        </span>
+        {% endif %}
+        
+        {% if epub.language %}
+        <span class="meta-item">
+          <i class="fas fa-language"></i>
+          {{ epub.language }}
+        </span>
+        {% endif %}
+        
+        {% if epub.published_date %}
+        <span class="meta-item">
+          <i class="fas fa-calendar"></i>
+          {{ epub.published_date | date: "%Y" }}
+        </span>
+        {% endif %}
+      </div>
+      
+      <div class="epub-card-actions">
+        <span class="read-more-btn">
+          <i class="fas fa-book-open"></i>
+          Xem chi tiết
+        </span>
+        
+        {% if epub.download_links %}
+        <span class="download-count">
+          <i class="fas fa-download"></i>
+          {{ epub.download_links.size }} link tải
+        </span>
+        {% endif %}
+      </div>
+    </div>
+  </a>
+</div>

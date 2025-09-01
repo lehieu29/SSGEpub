@@ -1,0 +1,254 @@
+---
+layout: page
+title: Admin Panel - Quản lý Epub
+permalink: /admin/
+---
+
+<div class="admin-panel">
+  <div class="admin-header">
+    <h1>Quản lý thư viện Epub</h1>
+    <p>Thêm, sửa và quản lý các sách điện tử trong thư viện</p>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="admin-tabs">
+    <button class="tab-btn active" data-tab="add-book">Thêm sách mới</button>
+    <button class="tab-btn" data-tab="manage-books">Quản lý sách</button>
+    <button class="tab-btn" data-tab="settings">Cài đặt</button>
+  </div>
+
+  <!-- Add Book Tab -->
+  <div class="tab-content active" id="add-book">
+    <div class="form-container">
+      <h2>Thêm sách mới</h2>
+      <form id="addBookForm" class="book-form">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h3>Thông tin cơ bản</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="title">Tên sách *</label>
+              <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+              <label for="author">Tác giả *</label>
+              <input type="text" id="author" name="author" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="isbn">ISBN</label>
+              <input type="text" id="isbn" name="isbn" placeholder="978-xxx-xxx-xxx">
+            </div>
+            <div class="form-group">
+              <label for="published_date">Ngày xuất bản</label>
+              <input type="date" id="published_date" name="published_date">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="publisher">Nhà xuất bản</label>
+              <input type="text" id="publisher" name="publisher">
+            </div>
+            <div class="form-group">
+              <label for="language">Ngôn ngữ</label>
+              <select id="language" name="language">
+                <option value="Tiếng Việt">Tiếng Việt</option>
+                <option value="English">English</option>
+                <option value="中文">中文</option>
+                <option value="日本語">日本語</option>
+                <option value="한국어">한국어</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pages">Số trang</label>
+              <input type="number" id="pages" name="pages" min="1">
+            </div>
+            <div class="form-group">
+              <label for="rating">Đánh giá (1-5)</label>
+              <input type="number" id="rating" name="rating" min="1" max="5" step="0.1">
+            </div>
+          </div>
+        </div>
+
+        <!-- Images -->
+        <div class="form-section">
+          <h3>Hình ảnh</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cover_image">URL ảnh bìa *</label>
+              <input type="url" id="cover_image" name="cover_image" required placeholder="https://example.com/cover.jpg">
+              <small>Upload ảnh lên S3 hoặc dịch vụ khác và dán link vào đây</small>
+            </div>
+            <div class="form-group">
+              <label for="preview_image">URL ảnh preview</label>
+              <input type="url" id="preview_image" name="preview_image" placeholder="https://example.com/preview.jpg">
+              <small>Ảnh preview nội dung sách (tùy chọn)</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Genres -->
+        <div class="form-section">
+          <h3>Thể loại</h3>
+          <div class="form-group">
+            <label for="genres">Thể loại (phân cách bằng dấu phẩy)</label>
+            <input type="text" id="genres" name="genres" placeholder="Văn học, Tiểu thuyết, Tình cảm">
+            <small>Ví dụ: Văn học, Tiểu thuyết, Tình cảm</small>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-section">
+          <h3>Mô tả và nội dung</h3>
+          <div class="form-group">
+            <label for="description">Mô tả sách *</label>
+            <textarea id="description" name="description" rows="4" required placeholder="Mô tả ngắn gọn về nội dung cuốn sách..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="preview_content">Nội dung preview *</label>
+            <textarea id="preview_content" name="preview_content" rows="10" required placeholder="Nhập nội dung preview của sách (hỗ trợ Markdown)..."></textarea>
+            <small>Hỗ trợ Markdown. Đây là phần nội dung người đọc có thể xem trước.</small>
+          </div>
+        </div>
+
+        <!-- Download Links -->
+        <div class="form-section">
+          <h3>Link tải xuống</h3>
+          <div id="downloadLinksContainer">
+            <div class="download-link-item">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Platform</label>
+                  <select name="platform[]" required>
+                    <option value="">Chọn platform</option>
+                    <option value="Google Drive">Google Drive</option>
+                    <option value="OneDrive">OneDrive</option>
+                    <option value="Mega">Mega</option>
+                    <option value="MediaFire">MediaFire</option>
+                    <option value="Dropbox">Dropbox</option>
+                    <option value="Other">Khác</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>URL</label>
+                  <input type="url" name="download_url[]" required placeholder="https://...">
+                </div>
+                <div class="form-group">
+                  <label>Index</label>
+                  <input type="number" name="download_index[]" min="0" required placeholder="0">
+                </div>
+                <div class="form-group">
+                  <button type="button" class="btn-remove-link">Xóa</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" id="addDownloadLink" class="btn btn-secondary">Thêm link tải</button>
+        </div>
+
+        <!-- Config URL -->
+        <div class="form-section">
+          <h3>Cấu hình động</h3>
+          <div class="form-group">
+            <label for="config_url">URL cấu hình download</label>
+            <input type="url" id="config_url" name="config_url" placeholder="https://api.example.com/config/book-id">
+            <small>URL API để lấy cấu hình hiển thị link download (tùy chọn)</small>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="form-section">
+          <h3>Tags</h3>
+          <div class="form-group">
+            <label for="tags">Tags (phân cách bằng dấu phẩy)</label>
+            <input type="text" id="tags" name="tags" placeholder="epub, văn học việt nam, bestseller">
+            <small>Tags để SEO và tìm kiếm</small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" id="previewBtn" class="btn btn-outline">Preview</button>
+          <button type="submit" class="btn btn-primary">Tạo sách</button>
+          <button type="button" id="resetBtn" class="btn btn-secondary">Reset form</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Manage Books Tab -->
+  <div class="tab-content" id="manage-books">
+    <div class="manage-container">
+      <h2>Quản lý sách hiện có</h2>
+      <div class="books-list">
+        <div class="search-bar">
+          <input type="text" id="searchBooks" placeholder="Tìm kiếm sách...">
+        </div>
+        <div id="booksList" class="books-grid">
+          <!-- Books will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div class="tab-content" id="settings">
+    <div class="settings-container">
+      <h2>Cài đặt</h2>
+      <div class="settings-section">
+        <h3>Cấu hình chung</h3>
+        <div class="form-group">
+          <label for="defaultConfigUrl">URL cấu hình mặc định</label>
+          <input type="url" id="defaultConfigUrl" placeholder="https://api.example.com/config/">
+        </div>
+        <div class="form-group">
+          <label for="defaultImageHost">Host ảnh mặc định</label>
+          <input type="text" id="defaultImageHost" placeholder="https://your-s3-bucket.com/">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div id="previewModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Preview Markdown</h3>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="previewContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generated Markdown Modal -->
+  <div id="markdownModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Generated Markdown File</h3>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="file-info">
+          <p><strong>Filename:</strong> <span id="generatedFilename"></span></p>
+          <p><strong>Path:</strong> <code>_epubs/<span id="generatedPath"></span></code></p>
+        </div>
+        <textarea id="generatedMarkdown" readonly></textarea>
+        <div class="modal-actions">
+          <button id="copyMarkdown" class="btn btn-primary">Copy to Clipboard</button>
+          <button id="downloadMarkdown" class="btn btn-secondary">Download File</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/admin.js"></script>

@@ -1,0 +1,152 @@
+---
+layout: base
+---
+
+<div class="layout--epub">
+  <div class="epub-container">
+    <!-- Header Section -->
+    <div class="epub-header">
+      <div class="epub-cover">
+        <img src="{{ page.cover_image }}" alt="{{ page.title }} cover" class="cover-image">
+      </div>
+      <div class="epub-info">
+        <h1 class="epub-title">{{ page.title }}</h1>
+        <h2 class="epub-author">{{ page.author }}</h2>
+        
+        <div class="epub-meta">
+          <div class="meta-item">
+            <span class="meta-label">Thể loại:</span>
+            <span class="meta-value">
+              {% for genre in page.genre %}
+                <span class="genre-tag">{{ genre }}</span>
+              {% endfor %}
+            </span>
+          </div>
+          
+          {% if page.rating %}
+          <div class="meta-item">
+            <span class="meta-label">Đánh giá:</span>
+            <span class="meta-value">
+              <div class="rating">
+                {% assign rating = page.rating %}
+                {% for i in (1..5) %}
+                  {% if i <= rating %}
+                    <i class="fas fa-star"></i>
+                  {% elsif i == rating | plus: 0.5 %}
+                    <i class="fas fa-star-half-alt"></i>
+                  {% else %}
+                    <i class="far fa-star"></i>
+                  {% endif %}
+                {% endfor %}
+                <span class="rating-number">{{ page.rating }}/5</span>
+              </div>
+            </span>
+          </div>
+          {% endif %}
+          
+          {% if page.pages %}
+          <div class="meta-item">
+            <span class="meta-label">Số trang:</span>
+            <span class="meta-value">{{ page.pages }}</span>
+          </div>
+          {% endif %}
+          
+          {% if page.published_date %}
+          <div class="meta-item">
+            <span class="meta-label">Năm xuất bản:</span>
+            <span class="meta-value">{{ page.published_date | date: "%Y" }}</span>
+          </div>
+          {% endif %}
+          
+          {% if page.publisher %}
+          <div class="meta-item">
+            <span class="meta-label">Nhà xuất bản:</span>
+            <span class="meta-value">{{ page.publisher }}</span>
+          </div>
+          {% endif %}
+          
+          {% if page.language %}
+          <div class="meta-item">
+            <span class="meta-label">Ngôn ngữ:</span>
+            <span class="meta-value">{{ page.language }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Description Section -->
+    {% if page.description %}
+    <div class="epub-description">
+      <h3>Mô tả</h3>
+      <p>{{ page.description }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Preview Section -->
+    {% if page.preview_content %}
+    <div class="epub-preview">
+      <h3>Xem trước</h3>
+      {% if page.preview_image %}
+      <div class="preview-image">
+        <img src="{{ page.preview_image }}" alt="{{ page.title }} preview" class="preview-img">
+      </div>
+      {% endif %}
+      <div class="preview-content">
+        {{ page.preview_content | markdownify }}
+      </div>
+      <div class="preview-note">
+        <i class="fas fa-info-circle"></i>
+        Đây chỉ là một phần nội dung của cuốn sách. Tải về để đọc toàn bộ.
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Download Section -->
+    {% if page.download_links %}
+    <div class="epub-download">
+      <h3>Tải xuống</h3>
+      <div class="download-buttons" id="downloadButtons">
+        <!-- Download buttons will be populated by JavaScript -->
+      </div>
+      <div class="download-note">
+        <i class="fas fa-download"></i>
+        Chọn một trong các link tải xuống bên dưới. Nếu link không hoạt động, hãy thử link khác.
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Tags Section -->
+    {% if page.tags %}
+    <div class="epub-tags">
+      <h3>Tags</h3>
+      <div class="tags-list">
+        {% for tag in page.tags %}
+          <span class="tag">{{ tag }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Content from markdown -->
+    {% if content and content != empty %}
+    <div class="epub-content">
+      {{ content }}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Include JavaScript enhancements -->
+<script src="/assets/js/download-config.js"></script>
+<script src="/assets/js/epub-enhancements.js"></script>
+
+<!-- Initialize download configuration for this page -->
+<script>
+window.epubDownloadConfig = {
+  containerId: 'downloadButtons',
+  configUrl: '{{ page.download_config_url }}',
+  downloadLinks: {{ page.download_links | jsonify }},
+  showLoadingIndicator: true
+};
+</script>

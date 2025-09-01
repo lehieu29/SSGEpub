@@ -1,0 +1,111 @@
+---
+layout: page
+title: Thư viện Sách Điện tử
+---
+
+<div class="home-hero">
+  <div class="hero-content">
+    <h1>Chào mừng đến với Thư viện Epub</h1>
+    <p>Khám phá bộ sưu tập sách điện tử phong phú với preview miễn phí và nhiều link download</p>
+    <div class="hero-actions">
+      <a href="/epubs/" class="btn btn-primary">
+        <i class="fas fa-book"></i>
+        Khám phá thư viện
+      </a>
+      <a href="#featured-books" class="btn btn-outline">
+        <i class="fas fa-star"></i>
+        Sách nổi bật
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="home-stats">
+  <div class="stat-card">
+    <div class="stat-number">{{ site.epubs.size }}</div>
+    <div class="stat-label">Tổng số sách</div>
+  </div>
+  <div class="stat-card">
+    {% assign genres = site.epubs | map: 'genre' | join: ',' | split: ',' | uniq %}
+    <div class="stat-number">{{ genres.size }}</div>
+    <div class="stat-label">Thể loại</div>
+  </div>
+  <div class="stat-card">
+    {% assign authors = site.epubs | map: 'author' | uniq %}
+    <div class="stat-number">{{ authors.size }}</div>
+    <div class="stat-label">Tác giả</div>
+  </div>
+</div>
+
+<section id="featured-books" class="featured-section">
+  <h2>Sách nổi bật</h2>
+  <div class="featured-grid">
+    {% assign featured_books = site.epubs | where_exp: "item", "item.rating >= 4.0" | sort: 'rating' | reverse | limit: 6 %}
+    {% for epub in featured_books %}
+      {% include epub-card.html epub=epub %}
+    {% endfor %}
+  </div>
+
+  {% if featured_books.size == 0 %}
+  <div class="no-featured">
+    <p>Chưa có sách nổi bật. Hãy thêm sách với rating cao!</p>
+  </div>
+  {% endif %}
+</section>
+
+<section class="recent-section">
+  <h2>Sách mới thêm</h2>
+  <div class="recent-grid">
+    {% assign recent_books = site.epubs | sort: 'date' | reverse | limit: 4 %}
+    {% for epub in recent_books %}
+      {% include epub-card.html epub=epub %}
+    {% endfor %}
+  </div>
+
+  <div class="section-footer">
+    <a href="/epubs/" class="view-all-btn">
+      Xem tất cả sách
+      <i class="fas fa-arrow-right"></i>
+    </a>
+  </div>
+</section>
+
+<section class="genres-section">
+  <h2>Thể loại phổ biến</h2>
+  <div class="genres-grid">
+    {% assign all_genres = site.epubs | map: 'genre' | join: ',' | split: ',' %}
+    {% assign genre_counts = '' | split: '' %}
+    {% for genre in all_genres %}
+      {% assign genre = genre | strip %}
+      {% unless genre == '' %}
+        {% assign found = false %}
+        {% for item in genre_counts %}
+          {% assign parts = item | split: '|' %}
+          {% if parts[0] == genre %}
+            {% assign count = parts[1] | plus: 1 %}
+            {% assign genre_counts = genre_counts | where_exp: "x", "x != item" %}
+            {% assign new_item = genre | append: '|' | append: count %}
+            {% assign genre_counts = genre_counts | push: new_item %}
+            {% assign found = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+        {% unless found %}
+          {% assign new_item = genre | append: '|1' %}
+          {% assign genre_counts = genre_counts | push: new_item %}
+        {% endunless %}
+      {% endunless %}
+    {% endfor %}
+
+    {% assign sorted_genres = genre_counts | sort | reverse | slice: 0, 8 %}
+    {% for item in sorted_genres %}
+      {% assign parts = item | split: '|' %}
+      {% assign genre = parts[0] %}
+      {% assign count = parts[1] %}
+      <a href="/epubs/?genre={{ genre | url_encode }}" class="genre-card">
+        <div class="genre-name">{{ genre }}</div>
+        <div class="genre-count">{{ count }} sách</div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
