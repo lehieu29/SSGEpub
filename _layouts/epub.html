@@ -29,10 +29,11 @@ layout: base
             <span class="meta-value">
               <div class="rating">
                 {% assign rating = page.rating %}
+                {% assign rating_half = rating | plus: 0.5 %}
                 {% for i in (1..5) %}
                   {% if i <= rating %}
                     <i class="fas fa-star"></i>
-                  {% elsif i == rating | plus: 0.5 %}
+                  {% elsif i == rating_half %}
                     <i class="fas fa-star-half-alt"></i>
                   {% else %}
                     <i class="far fa-star"></i>
