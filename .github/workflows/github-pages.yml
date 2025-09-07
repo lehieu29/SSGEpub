@@ -16,6 +16,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 # Cho phép only one concurrent deployment
 concurrency:
@@ -39,7 +40,7 @@ jobs:
           
       - name: 🔧 Setup Pages
         id: pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v4
         
       - name: 📦 Install dependencies
         run: bundle install
@@ -50,7 +51,7 @@ jobs:
           JEKYLL_ENV: production
           
       - name: 📤 Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v4
 
   # Deployment job
   deploy:
@@ -62,4 +63,4 @@ jobs:
     steps:
       - name: 🚀 Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
