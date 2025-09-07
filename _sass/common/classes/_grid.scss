@@ -1,4 +1,4 @@
-@use "sass:math";
+// @use "sass:math"; // Removed - not supported by ruby-sass
 
 $grid-columns: 12;
 
@@ -20,7 +20,7 @@ $grid-columns: 12;
     @include flex(1);
   } @else {
     @include flex(none);
-    width: percentage(math.div($columns, $grid-columns));
+    width: percentage(($columns / $grid-columns));
   }
 }
 

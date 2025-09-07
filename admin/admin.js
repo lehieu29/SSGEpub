@@ -1,5 +1,45 @@
 // Admin Panel JavaScript
 
+/**
+ * Simple obfuscation utilities (shared with frontend)
+ * Purpose: Hide download URLs from basic inspection
+ */
+class LinkObfuscator {
+    static encode(url) {
+        try {
+            // Simple XOR with key + Base64
+            const key = 'SSGEpub2024';
+            let result = '';
+            for (let i = 0; i < url.length; i++) {
+                result += String.fromCharCode(
+                    url.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+                );
+            }
+            return btoa(result);
+        } catch (e) {
+            console.error('Failed to encode URL:', e);
+            return url;
+        }
+    }
+    
+    static decode(encoded) {
+        try {
+            const key = 'SSGEpub2024';
+            const decoded = atob(encoded);
+            let result = '';
+            for (let i = 0; i < decoded.length; i++) {
+                result += String.fromCharCode(
+                    decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+                );
+            }
+            return result;
+        } catch (e) {
+            console.error('Failed to decode URL:', e);
+            return null;
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Tab functionality
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -129,9 +169,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const downloadLinks = [];
         for (let i = 0; i < platforms.length; i++) {
             if (platforms[i] && urls[i]) {
+                
+                // Encode URL for obfuscation
+                const encodedUrl = `data:encoded,${LinkObfuscator.encode(urls[i])}`;
+                
                 downloadLinks.push({
                     platform: platforms[i],
-                    url: urls[i],
+                    url: encodedUrl,  // Use encoded URL
                     index: parseInt(indices[i]) || i,
                     icon: getIconForPlatform(platforms[i])
                 });

@@ -18,11 +18,16 @@
 ##############################
 text_skin: default # "default" (default), "dark", "forest", "ocean", "chocolate", "orange"
 highlight_theme: default # "default" (default), "tomorrow", "tomorrow-night", "tomorrow-night-eighties", "tomorrow-night-blue", "tomorrow-night-bright"
-url     : # the base hostname & protocol for your site e.g. https://www.someone.com
-baseurl : # does not include hostname
+
+# 🚀 GitHub Pages Configuration
+url     : "https://lehieu29.github.io" # ⚠️ THAY ĐỔI: Thay yourusername bằng GitHub username của bạn
+baseurl : "/SSGEpub" # Repository subdirectory deployment
 title   : SSG Epub Library
 description: > # this means to ignore newlines until "Language & timezone"
   Thư viện sách điện tử với preview và download links từ nhiều platform
+
+# GitHub Pages specific settings
+repository: lehieu29/SSGEpub # ⚠️ THAY ĐỔI: Thay bằng repository thực tế của bạn
 
 
 ## => Language and Timezone
@@ -55,8 +60,8 @@ author:
 
 ## => GitHub Repository (if the site is hosted by GitHub)
 ##############################
-repository: user_name/repo_name
-repository_tree: master
+# repository: Already configured above in Site Settings
+repository_tree: master # Updated to use main branch
 
 
 ## => Paths
@@ -200,6 +205,12 @@ exclude:
   - /screenshots
   - /test
   - /vendor
+  # 🚀 GitHub Pages optimizations
+  - .cursor/          # Exclude dev tools
+  - admin_tool/       # Exclude Python admin tool
+  - .github/          # Exclude GitHub workflows (nếu có)
+  - .augment/         # Exclude augment files
+  - SSG_Epub_Admin_Tool.ipynb  # Exclude notebook
 
 defaults:
   - scope:

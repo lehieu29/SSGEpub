@@ -2,8 +2,8 @@
 layout: "epub"
 title: "Khéo Ăn Nói Sẽ Có Được Thiên Hạ"
 author: "Trác Nhã"
-cover_image: "https://drive.google.com/file/d/1vX2UC35dwYMVZ2rRoIbJGOa4NhIXr0nN/view?usp=sharing"
-preview_image: "https://drive.google.com/file/d/1vX2UC35dwYMVZ2rRoIbJGOa4NhIXr0nN/view?usp=sharing"
+cover_image: "https://res.cloudinary.com/do7haig17/image/upload/v1757216931/13_cgjuon.jpg"
+preview_image: "https://res.cloudinary.com/do7haig17/image/upload/v1757216931/13_cgjuon.jpg"
 genre:
   - "Kỹ năng sống"
   - "Phát triển bản thân"

@@ -1,4 +1,44 @@
 /**
+ * Simple obfuscation utilities
+ * Purpose: Hide download URLs from basic inspection
+ */
+class LinkObfuscator {
+    static encode(url) {
+        try {
+            // Simple XOR with key + Base64
+            const key = 'SSGEpub2024';
+            let result = '';
+            for (let i = 0; i < url.length; i++) {
+                result += String.fromCharCode(
+                    url.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+                );
+            }
+            return btoa(result);
+        } catch (e) {
+            console.error('Failed to encode URL:', e);
+            return url;
+        }
+    }
+    
+    static decode(encoded) {
+        try {
+            const key = 'SSGEpub2024';
+            const decoded = atob(encoded);
+            let result = '';
+            for (let i = 0; i < decoded.length; i++) {
+                result += String.fromCharCode(
+                    decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+                );
+            }
+            return result;
+        } catch (e) {
+            console.error('Failed to decode URL:', e);
+            return null;
+        }
+    }
+}
+
+/**
  * Download Configuration Manager
  * Handles dynamic loading of download link configurations
  */
@@ -87,42 +127,43 @@ class DownloadConfigManager {
     }
 
     /**
-     * Filter links based on configuration
-     * @param {Object} config - The configuration object
+     * Filter links based on configuration (now supports single index)
+     * @param {Object|Number} config - The configuration object or single index
      * @param {Array} allLinks - All available download links
      * @returns {Array} Filtered download links
      */
     filterLinks(config, allLinks) {
-        if (!config || !allLinks || allLinks.length === 0) {
+        if (!config && config !== 0 || !allLinks || allLinks.length === 0) {
             return allLinks;
         }
 
-        // Support both single index and multiple indices
-        let activeIndices = [];
+        let activeIndex;
         
-        if (Array.isArray(config.activeIndices)) {
-            activeIndices = config.activeIndices;
-        } else if (typeof config.activeIndex === 'number') {
-            activeIndices = [config.activeIndex];
+        // Support direct number response (new format)
+        if (typeof config === 'number') {
+            activeIndex = config;
         } else if (typeof config.index === 'number') {
-            activeIndices = [config.index];
+            activeIndex = config.index;
+        } else if (typeof config.activeIndex === 'number') {
+            activeIndex = config.activeIndex;
+        } else if (Array.isArray(config.activeIndices) && config.activeIndices.length > 0) {
+            // Backward compatibility: take first index from array
+            activeIndex = config.activeIndices[0];
         } else {
-            console.warn('Invalid config format, using all links');
-            return allLinks;
+            console.warn('Invalid config format, using first link');
+            return allLinks.length > 0 ? [allLinks[0]] : [];
         }
 
-        // Filter links by active indices
-        const filteredLinks = allLinks.filter(link => 
-            activeIndices.includes(link.index)
-        );
-
-        if (filteredLinks.length === 0) {
-            console.warn('No links match the active indices, using all links');
-            return allLinks;
+        // Find link by index
+        const selectedLink = allLinks.find(link => link.index === activeIndex);
+        
+        if (selectedLink) {
+            console.log(`Selected link at index ${activeIndex}: ${selectedLink.platform}`);
+            return [selectedLink];
+        } else {
+            console.warn(`No link found at index ${activeIndex}, using first available link`);
+            return allLinks.length > 0 ? [allLinks[0]] : [];
         }
-
-        console.log(`Filtered ${filteredLinks.length} links from ${allLinks.length} total`);
-        return filteredLinks;
     }
 
     /**
@@ -189,15 +230,31 @@ class DownloadConfigManager {
         // Create buttons for each link
         links.forEach(link => {
             const button = document.createElement('a');
-            button.href = link.url;
+            
+            // Decode URL if it's obfuscated
+            let actualUrl = link.url;
+            if (link.url && link.url.startsWith('data:encoded,')) {
+                const encodedPart = link.url.replace('data:encoded,', '');
+                const decodedUrl = LinkObfuscator.decode(encodedPart);
+                
+                if (decodedUrl) {
+                    actualUrl = decodedUrl;
+                    console.log(`Decoded URL for ${link.platform}`);
+                } else {
+                    console.warn(`Failed to decode URL for ${link.platform}, using original`);
+                    actualUrl = link.url;
+                }
+            }
+            
+            button.href = actualUrl;
             button.className = 'download-btn';
             button.target = '_blank';
             button.rel = 'noopener noreferrer';
             button.setAttribute('data-platform', link.platform);
             
-            // Add click tracking
+            // Add click tracking với actual URL
             button.addEventListener('click', () => {
-                this.trackDownload(link.platform, link.url);
+                this.trackDownload(link.platform, actualUrl);
             });
             
             button.innerHTML = `

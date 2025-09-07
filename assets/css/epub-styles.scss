@@ -474,12 +474,17 @@
         }
       }
       
-      .download-count {
+      .availability-indicator {
         font-size: 0.75rem;
         color: #28a745;
         display: flex;
         align-items: center;
         gap: 0.25rem;
+        font-weight: 500;
+        
+        .fas {
+          color: #28a745;
+        }
       }
     }
   }
