@@ -49,13 +49,13 @@ body {
   margin: 0;
   font: map-get($base, font-weight) #{map-get($base, font-size)}/#{map-get($base, line-height)} map-get($base, font-family);
   ::-moz-selection {
-    background: $select-color;
+    background: none;
   }
   ::-webkit-selection {
-    background: $select-color;
+    background: none;
   }
   ::selection {
-    background: $select-color;
+    background: none;
   }
 }
 

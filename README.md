@@ -350,7 +350,7 @@ encoding: utf-8
 ### Website không load CSS:
 Kiểm tra file `_sass/custom.scss` có import đúng:
 ```scss
-@import url('/assets/css/epub-styles.css');
+@import url('/assets/css/epub-styles.scss');
 ```
 
 ## 📄 License

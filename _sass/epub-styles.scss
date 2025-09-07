@@ -1,6 +1,3 @@
----
----
-
 /* Home Page Styles */
 .home-hero {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1342,6 +1339,18 @@
     background: #1a202c;
     color: #e2e8f0;
 
+    h1 {
+      color: #f7fafc;
+    }
+
+    .epub-author {
+      color: #d5dfeb !important;
+    }
+
+    .meta-label {
+      color: #c4c9cf !important;
+    }
+
     .epub-description,
     .epub-preview,
     .epub-download,
@@ -1356,6 +1365,11 @@
     .epub-preview .preview-content {
       background: #4a5568;
       color: #e2e8f0;
+    }
+
+    .preview-note,
+    .download-note {
+      color: #989ea7 !important;
     }
   }
 
